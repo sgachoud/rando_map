@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="rando_map" xmlns="http://www.topografix.com/GPX/1/1">
+  <trk>
+    <name>Sample Hike</name>
+    <trkseg>
+      <trkpt lat="46.2044" lon="6.1432"><ele>380</ele></trkpt>
+      <trkpt lat="46.2100" lon="6.1500"><ele>420</ele></trkpt>
+      <trkpt lat="46.2180" lon="6.1600"><ele>510</ele></trkpt>
+      <trkpt lat="46.2250" lon="6.1550"><ele>600</ele></trkpt>
+      <trkpt lat="46.2300" lon="6.1450"><ele>560</ele></trkpt>
+      <trkpt lat="46.2260" lon="6.1350"><ele>480</ele></trkpt>
+      <trkpt lat="46.2150" lon="6.1380"><ele>410</ele></trkpt>
+      <trkpt lat="46.2044" lon="6.1432"><ele>380</ele></trkpt>
+    </trkseg>
+  </trk>
+</gpx>
