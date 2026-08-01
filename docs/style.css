@@ -33,6 +33,39 @@ html, body {
   transform: translateX(-100%);
 }
 
+#toolbar {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+#toolbar input,
+#toolbar select {
+  font-size: 13px;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  flex: 1 1 100%;
+}
+
+#select-buttons {
+  display: flex;
+  gap: 6px;
+  flex: 1 1 100%;
+}
+
+#select-buttons button {
+  flex: 1;
+  font-size: 12px;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: #f7f7f7;
+  cursor: pointer;
+}
+
 #status {
   padding: 10px 12px;
   font-size: 13px;
@@ -47,22 +80,38 @@ html, body {
 }
 
 #hike-list li {
-  padding: 10px 12px;
   border-bottom: 1px solid #eee;
-  cursor: pointer;
   user-select: none;
 }
 
-#hike-list li.selected {
-  background: #e8f0fe;
+#hike-list li .row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+#hike-list li.expanded .row {
+  background: #f5f5f5;
+}
+
+#hike-list li .visibility-checkbox {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
 }
 
 #hike-list li .swatch {
-  display: inline-block;
+  flex: 0 0 auto;
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  margin-right: 8px;
+}
+
+#hike-list li .summary {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 #hike-list li .name {
@@ -73,6 +122,42 @@ html, body {
 #hike-list li .meta {
   font-size: 12px;
   color: #666;
+}
+
+#hike-list li .chevron {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: #999;
+  transition: transform 0.15s ease;
+}
+
+#hike-list li.expanded .chevron {
+  transform: rotate(90deg);
+}
+
+#hike-list li .details {
+  padding: 4px 12px 12px 38px;
+}
+
+#hike-list li .details dl {
+  margin: 0;
+  font-size: 13px;
+}
+
+#hike-list li .details dt {
+  color: #888;
+  font-size: 11px;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
+
+#hike-list li .details dd {
+  margin: 0;
+  color: #222;
+}
+
+#hike-list li .details a {
+  color: #1a73e8;
 }
 
 #toggle-sidebar {

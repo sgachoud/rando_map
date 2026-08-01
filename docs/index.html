@@ -13,6 +13,19 @@
 <body>
 <div id="app">
   <div id="sidebar">
+    <div id="toolbar">
+      <input id="search" type="search" placeholder="Filter hikes...">
+      <select id="sort">
+        <option value="date-desc">Date (newest first)</option>
+        <option value="date-asc">Date (oldest first)</option>
+        <option value="name">Name (A-Z)</option>
+        <option value="region">Region</option>
+      </select>
+      <div id="select-buttons">
+        <button id="select-all">Select all</button>
+        <button id="select-none">Clear</button>
+      </div>
+    </div>
     <div id="status">Loading hikes...</div>
     <ul id="hike-list"></ul>
   </div>
