@@ -147,9 +147,10 @@ async function renderSelection() {
     try {
       const points = await fetchGpxPoints(hike.gpxFilename);
       if (points.length === 0) continue;
-      L.polyline(points, { color, weight: 3 }).bindTooltip(hike.name).addTo(layerGroup);
-      L.circleMarker(points[0], { color, radius: 5, fillOpacity: 1 }).bindTooltip(`${hike.name} - Start`).addTo(layerGroup);
-      L.circleMarker(points[points.length - 1], { color, radius: 5, fillOpacity: 1 }).bindTooltip(`${hike.name} - End`).addTo(layerGroup);
+      const stopClickPropagation = (layer) => layer.on("click", (e) => L.DomEvent.stopPropagation(e));
+      stopClickPropagation(L.polyline(points, { color, weight: 3 }).bindTooltip(hike.name).addTo(layerGroup));
+      stopClickPropagation(L.circleMarker(points[0], { color, radius: 5, fillOpacity: 1 }).bindTooltip(`${hike.name} - Start`).addTo(layerGroup));
+      stopClickPropagation(L.circleMarker(points[points.length - 1], { color, radius: 5, fillOpacity: 1 }).bindTooltip(`${hike.name} - End`).addTo(layerGroup));
       allPoints.push(...points);
     } catch (err) {
       failed.push(`${hike.name} (${err.message})`);
@@ -301,19 +302,24 @@ function setupToolbar() {
   });
 }
 
-function setupSidebarToggle() {
+const mobileQuery = window.matchMedia("(max-width: 700px)");
+
+function setupMapTapToggle() {
   const sidebar = document.getElementById("sidebar");
-  const toggle = document.getElementById("toggle-sidebar");
-  toggle.addEventListener("click", () => sidebar.classList.toggle("open"));
+  map.on("click", () => {
+    if (!mobileQuery.matches) return;
+    sidebar.classList.toggle("open");
+  });
 }
 
 async function main() {
-  map = L.map("map").setView([46.5, 6.6], 9);
+  map = L.map("map", { zoomControl: false }).setView([46.5, 6.6], 9);
+  L.control.zoom({ position: "bottomright" }).addTo(map);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap contributors",
   }).addTo(map);
   layerGroup = L.layerGroup().addTo(map);
-  setupSidebarToggle();
+  setupMapTapToggle();
   setupToolbar();
 
   if (!apiKey) {
