@@ -6,7 +6,7 @@ const TRACK_COLORS = ["#e6194b", "#3cb44b", "#4363d8", "#f58231", "#911eb4", "#4
 const NAME_HEADER_PATTERN = /nom/i;
 const GPX_HEADER_PATTERN = /^gpx$/i;
 const REGION_HEADER_PATTERN = /canton|pays|r[ée]gion/i;
-const DURATION_HEADER_PATTERN = /dur[ée]e/i;
+const INFO_HEADER_PATTERN = /informations/i;
 const DATE_HEADER_PATTERN = /date/i;
 const URL_PATTERN = /^https?:\/\//i;
 
@@ -15,6 +15,7 @@ const statusEl = document.getElementById("status");
 const listEl = document.getElementById("hike-list");
 const searchEl = document.getElementById("search");
 const sortEl = document.getElementById("sort");
+const regionEl = document.getElementById("filter-region");
 
 const gpxCache = new Map();
 const visible = new Set(); // hike names currently shown on the map
@@ -60,7 +61,7 @@ function parseHikes(rows) {
   const nameIdx = header.findIndex((h) => NAME_HEADER_PATTERN.test(h));
   const gpxIdx = header.findIndex((h) => GPX_HEADER_PATTERN.test(h));
   const regionIdx = header.findIndex((h) => REGION_HEADER_PATTERN.test(h));
-  const durationIdx = header.findIndex((h) => DURATION_HEADER_PATTERN.test(h));
+  const infoIdx = header.findIndex((h) => INFO_HEADER_PATTERN.test(h));
   const dateIdx = header.findIndex((h) => DATE_HEADER_PATTERN.test(h));
 
   if (nameIdx === -1 || gpxIdx === -1) {
@@ -83,7 +84,7 @@ function parseHikes(rows) {
       name,
       gpxFilename: (row[gpxIdx] || "").trim(),
       region: regionIdx >= 0 ? (row[regionIdx] || "").trim() : "",
-      duration: durationIdx >= 0 ? (row[durationIdx] || "").trim() : "",
+      information: infoIdx >= 0 ? (row[infoIdx] || "").trim() : "",
       date: dateIdx >= 0 ? (row[dateIdx] || "").trim() : "",
       parsedDate: dateIdx >= 0 ? parseSwissDate(row[dateIdx]) : null,
       details,
@@ -221,7 +222,7 @@ function buildHikeItem(hike) {
   name.textContent = hike.name;
   const meta = document.createElement("div");
   meta.className = "meta";
-  meta.textContent = [hike.region, hike.duration, hike.date].filter(Boolean).join(" · ");
+  meta.textContent = [hike.region, hike.information, hike.date].filter(Boolean).join(" · ");
   summary.appendChild(name);
   summary.appendChild(meta);
 
@@ -254,9 +255,11 @@ function buildHikeItem(hike) {
 
 function getFilteredSortedHikes() {
   const query = searchEl.value.trim().toLowerCase();
+  const region = regionEl.value;
   let hikes = allHikes.filter((h) => {
+    if (region && h.region !== region) return false;
     if (!query) return true;
-    const haystack = [h.name, h.region, h.duration, h.date, ...h.details.map((d) => d.value)].join(" ").toLowerCase();
+    const haystack = [h.name, h.region, h.information, h.date, ...h.details.map((d) => d.value)].join(" ").toLowerCase();
     return haystack.includes(query);
   });
 
@@ -277,6 +280,16 @@ function getFilteredSortedHikes() {
   return hikes;
 }
 
+function populateRegionFilter() {
+  const regions = [...new Set(allHikes.map((h) => h.region).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  for (const region of regions) {
+    const opt = document.createElement("option");
+    opt.value = region;
+    opt.textContent = region;
+    regionEl.appendChild(opt);
+  }
+}
+
 function refreshList() {
   listEl.innerHTML = "";
   const hikes = getFilteredSortedHikes();
@@ -288,6 +301,7 @@ function refreshList() {
 function setupToolbar() {
   searchEl.addEventListener("input", refreshList);
   sortEl.addEventListener("change", refreshList);
+  regionEl.addEventListener("change", refreshList);
 
   document.getElementById("select-all").addEventListener("click", () => {
     for (const hike of getFilteredSortedHikes()) visible.add(hike.name);
@@ -332,13 +346,11 @@ async function main() {
     const [hikes, gpxFiles] = await Promise.all([listHikes(sheetId), driveList(gpxFolderId)]);
     gpxFilesById = new Map(gpxFiles.map((f) => [f.name, f]));
     allHikes = hikes;
+    populateRegionFilter();
     refreshList();
 
     if (hikes.length > 0) {
-      visible.add(hikes[0].name);
-      expanded.add(hikes[0].name);
-      refreshList();
-      await renderSelection();
+      setStatus("Select one or more hikes to show on the map");
     } else {
       setStatus("No hikes found");
     }
